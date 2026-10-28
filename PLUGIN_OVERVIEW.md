@@ -16,6 +16,6 @@ A result is seen after you click into its column and leave it. BB's native read 
 
 ## Requirements
 
-BB 0.47.1 or later with the standard sidebar. Uses experimental APIs and internal sidebar markup, which may change with BB updates. No extra account or service is required. True Colors is optional; gray badges still distinguish providers. Running agents uses your configured BB providers and their normal costs. No telemetry is added.
+BB 0.47.1 or later with the standard sidebar. Uses experimental APIs and internal sidebar markup, which may change with BB updates. No extra account or service is required. True Colors is optional; standalone badges show model and effort in gray text. Running agents uses your configured BB providers and their normal costs. No telemetry is added.
 
 See the [README](https://github.com/neoromantic/bb-plugin-model-effort-badges#readme) for settings, data access and release instructions.
