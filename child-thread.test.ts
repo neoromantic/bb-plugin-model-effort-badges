@@ -36,6 +36,10 @@ test("every active thread offers a child, including children and threads without
 
 test("the child is spawned under the row's own thread, keeping every composer selection", () => {
   const args = childSpawnArgs(thread, request);
-  expect(args).toEqual({ ...request, parentThreadId: "thr_parent", sectionId: "sec_a", pinned: false, origin: "app" });
+  expect(args).toEqual({
+    ...request,
+    executionInputSources: { providerId: "explicit", model: "explicit", reasoningLevel: "explicit", permissionMode: "explicit", serviceTier: "explicit" },
+    parentThreadId: "thr_parent", sectionId: "sec_a", pinned: false, origin: "app",
+  });
   expect(childSpawnArgs({ ...thread, pinnedAt: 5, sectionId: null }, request)).toMatchObject({ sectionId: null, pinned: true });
 });

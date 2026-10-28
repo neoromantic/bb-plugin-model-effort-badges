@@ -33,6 +33,7 @@ export function childThreadItem(thread: PluginThreadActionTarget): PluginThreadA
 export function childSpawnArgs(parent: ChildTarget, request: NewThreadRequest) {
   return {
     ...request,
+    executionInputSources: { providerId: "explicit", model: "explicit", reasoningLevel: "explicit", permissionMode: "explicit", serviceTier: "explicit" } as const,
     parentThreadId: parent.id,
     sectionId: parent.sectionId,
     pinned: parent.pinnedAt !== null,

@@ -8,13 +8,13 @@ See which BB threads need you: open a parent beside its subthreads, spot failed 
 
 ## Install
 
-Requires BB 0.47.1 or later with its standard sidebar. The plugin uses experimental BB APIs and internal sidebar attributes; a future BB update or replacement sidebar may affect it.
+Requires BB 0.47.1 or later with its standard sidebar. The plugin uses experimental BB APIs and internal sidebar attributes; a future BB update or replacement sidebar may affect it. BB's native split glyph hides collapsed failure and unread overlays.
 
 ```sh
 bb plugin install npm:bb-plugin-model-effort-badges@0.6.0 --yes
 ```
 
-The plugin's stable ID is `model-effort-badges`. Existing settings and attention records keep that identity. No external account, service or separate collector is needed. True Colors is optional: without it, badges are gray and still use outline/fill to distinguish Codex and Claude Code.
+The plugin's stable ID is `model-effort-badges`. Existing settings and attention records keep that identity. No external account, service or separate collector is needed. True Colors is optional: without it, badges show gray text without outline or fill.
 
 ## Columns and statuses
 
@@ -30,7 +30,7 @@ The plugin records non-empty assistant results from newly finished runs. Older r
 
 ## Badges and child threads
 
-A badge combines the first letter of the model family with the reasoning effort, for example `Sh` for Sol / High or `Oxh` for Opus / Extra high. Hover for the full model and effort. Codex uses an outlined tile and Claude Code a filled tile; other providers retain their logo. `?` means the thread's model is unknown. Model names come from the provider catalog and reflect the next turn's execution options.
+A badge combines the first letter of the model family with the reasoning effort, for example `Sh` for Sol / High or `Oxh` for Opus / Extra high. Hover for the full model and effort. With True Colors, Codex uses an outlined tile and Claude Code a filled tile; other providers retain their logo. `?` means the thread's model is unknown. Model names come from the provider catalog and reflect the next turn's execution options.
 
 The thread actions menu adds **New child thread**. It opens BB's composer with the parent's project and environment. Sending preserves its parent, section and pin state; the selected model, effort, attachments and scheduling remain available. Close or click outside to dismiss; the draft is kept per parent. Creating and running an agent uses your existing BB provider and its normal costs.
 
