@@ -1,76 +1,82 @@
-# Thread Columns
+# Model & Effort Badges
 
-See which BB threads need you: open a parent beside its subthreads, spot failed or waiting work, and read each thread's model and effort at a glance.
+Shows the thread's model and reasoning effort at the provider logo in BB's sidebar. For Codex and Claude Code, a model-and-effort tile replaces the logo. Provider color and style require True Colors.
 
-![Thread Columns running in BB with synthetic example threads](assets/columns.png)
-
-*All threads and messages in the demo are synthetic examples.*
-
-## Install
-
-Requires BB 0.47.1 or later with its standard sidebar. The plugin uses experimental BB APIs and internal sidebar attributes; a future BB update or replacement sidebar may affect it. BB's native split glyph hides collapsed failure and unread overlays.
-
-```sh
-bb plugin install npm:bb-plugin-model-effort-badges@0.6.0 --yes
+```
+[Ah]  BB                Ah   = GPT-6-Astra, High      (Codex; outlined with True Colors)
+[Ouc] BB: model and …   Ouc  = Opus 5.5, Ultracode    (Claude; filled with True Colors)
 ```
 
-The plugin's stable ID is `model-effort-badges`. Existing settings and attention records keep that identity. No external account, service or separate collector is needed. True Colors is optional: without it, badges show gray text without outline or fill.
+- **Letter:** the model family taken from the provider catalog name, without the vendor prefix. For example, Astra, Sol and Luna for Codex; Opus, Sonnet, Haiku and Fable for Claude.
+- **Effort:** `0` none, `l` low, `m` medium, `h` high, `xh` extra high, `max`, `u` ultra, `uc` ultracode. Any other level shows its first two letters.
+- **Color:** the tile takes its hue from True Colors (`--pbm-brand-codex`, `--pbm-brand-claude-code` and its chroma settings). Codex is outlined, Claude is filled. Without True Colors, the letters remain gray but the colored outline and fill do not render. Two providers can show the same code (for example `Sh`); use the full-name tooltip to distinguish them.
+- **Hover:** hover the logo for the full model name and effort. BB's own provider tooltip gets a second line, for example `GPT-6-Astra · High`.
+- **Screen readers:** the thread link reads `GPT-6-Astra, High reasoning effort` as its description.
+- **Unknown:** `?` means BB has no model for the thread. The plugin never guesses one from the provider.
 
-## Columns and statuses
+![Model and effort badges in BB](assets/badges.png)
 
-Open a thread whose descendants need you. Its chat appears on the left, followed by eligible subthreads at any depth in tree order. A path and colored stripe show nesting. Each column has BB's own chat and composer.
+*BB 0.47.1 with synthetic example data, without True Colors. Gray codes do not identify providers.*
 
-- Waiting for your answer or approval takes priority, including a running agent blocked on you. Otherwise only idle failed threads and unread results get columns. Working, queued, hidden and archived threads do not.
-- The default limit is eight descendant columns plus the parent. Overflow shows as **+N more**; hover for titles. Waiting threads come first, then failures, then unread results, newest first.
-- **Only this thread** returns to the plain view for this tab until another descendant starts needing you. **Open** opens one column's thread normally. Automatic columns stay off on phone-width windows and when focusing an existing split pane.
-- A column stays while you work in it. After its work is seen and idle it dims with a check mark; it disappears on the next opening. Off-screen chats mount as you scroll near them.
-- A red cross means failure, an amber question means a pending answer or approval, and a dot means an unread result. Collapsed parents include hidden descendants' failure and unread marks. Titles starting with `○ ` are emphasized, with the prefix hidden only in the visible sidebar text.
+## Data
 
-The plugin records non-empty assistant results from newly finished runs. Older results are unknown. A descendant's result is seen after you click into its column and then leave it or the page; focus alone does not engage it. The parent is seen while open in a visible, focused window. BB's own read tracking also runs inside every embedded chat and can clear native failure/unread marks. The plugin itself never calls BB's read/unread actions.
+Each visible row reads `threads.defaultExecutionOptions`, which calls `GET /api/v1/threads/:id/default-execution-options`. This is the value the composer uses for the thread's next turn: the sticky override if set, else the last turn request, else the project default. On the server it is one indexed lookup, not a history scan.
 
-## Badges and child threads
+Names come from `providers.models` once per provider. The plugin fetches a row again only when `updatedAt` or `status` changes in BB's live sidebar data. There are no timers or polling.
 
-A badge combines the first letter of the model family with the reasoning effort, for example `Sh` for Sol / High or `Oxh` for Opus / Extra high. Hover for the full model and effort. With True Colors, Codex uses an outlined tile and Claude Code a filled tile; other providers retain their logo. `?` means the thread's model is unknown. Model names come from the provider catalog and reflect the next turn's execution options.
+A message sent to a thread that is already running does not change `updatedAt`, so a model switch made that way shows once the thread goes idle.
 
-The thread actions menu adds **New child thread**. It opens BB's composer with the parent's project and environment. Sending preserves its parent, section and pin state; the selected model, effort, attachments and scheduling remain available. Close or click outside to dismiss; the draft is kept per parent. Creating and running an agent uses your existing BB provider and its normal costs.
+## Setting
 
-## Settings
+`Badge placement` (Settings → Installed plugins → Model & Effort Badges):
 
-Open **Settings → Installed plugins → Thread Columns**.
-
-| Setting key | Values | Default |
-| --- | --- | --- |
-| `placement` | `tile`, `under`, `beside` | `tile` |
-| `columns` | `auto`, `off` | `auto` |
-| `maxColumns` | Whole number, at least 1 | `8` |
+- `tile` (default): Codex and Claude Code rows show a 16px-high tile instead of the logo. The tile is as wide as its code plus padding, and the title starts 4px after it, so a longer code such as `Sxh` or `Omax` moves the title further right. The tile never reaches into the tree indent, so it cannot touch guides or chevrons. Other providers keep the logo with the caption under it.
+- `under`: a 9px caption under every provider logo. Title width does not change.
+- `beside`: a 10.5px chip next to every provider logo. It is easier to read but takes about three title characters.
 
 ```sh
-bb plugin config model-effort-badges set columns off
-bb plugin config model-effort-badges set maxColumns 6
 bb plugin config model-effort-badges set placement under
-bb plugin update model-effort-badges
+bb plugin config model-effort-badges unset placement   # back to tile
+```
+
+## Coming from Thread Columns 0.6.0
+
+0.7.0 shows badges only. Install [Subthread Columns](https://github.com/neoromantic/bb-plugin-subthread-columns) 0.1.0 separately for columns. **Before updating**, record your actual `columns`, `maxColumns` and `placement`; follow [migration](MIGRATION.md) to restore the exact column values under the new ID. Restore badge placement under `model-effort-badges` after a pinned-version reinstall.
+
+Sidebar status marks, unread-result tracking, manager styling and **New child thread** move to Responsibilities (`responsibilities`), a separate plugin not included or publicly available here. 0.7.0 leaves the old attention database intact and unopened.
+
+## Install, update, uninstall
+
+Requires BB 0.46.1 and SDK 0.6.49 or later. This split was runtime-tested on BB 0.47.1; no fresh BB 0.46.1 runtime test is claimed.
+
+```sh
+bb plugin install npm:bb-plugin-model-effort-badges@0.7.0 --yes
 bb plugin disable model-effort-badges
 bb plugin remove model-effort-badges
 ```
 
-## Data and access
+For a tracking source, use `bb plugin update model-effort-badges --yes`. To change a pinned version or installation source, save the plugin settings, remove its registration, install the desired version, then restore those settings individually. Removal resets settings. Source installation: `bb plugin install https://github.com/neoromantic/bb-plugin-model-effort-badges#v0.7.0 --yes`.
 
-This is a full-trust BB plugin. It reads thread metadata, model catalogs, execution options and the just-finished run's events. It stores result/seen timestamps in its own local SQLite database and uses BB RPC/realtime to update the interface. It does not scan earlier history, poll providers or add telemetry. Sending through a column or child composer uses BB's normal agent execution.
+## Compatibility
 
-## Develop and release
+The plugin survives ordinary BB upgrades: it does not patch BB, its thread list or its database. What can break on an upgrade is the internal sidebar markup and the experimental APIs below. Then the affected badge disappears and BB's own sidebar works as before.
 
-Use Bun. The build tool is pinned to official BB 0.47.1.
+- Internal markup it reads or decorates: `[data-sidebar-rename-row]`, `a[data-sidebar-thread-id]`, and the provider logo.
+- The plugin runs as an app overlay (`experimental_appOverlay`), because it needs `useSidebarThreads`, `useSdk` and `useSettings`.
+- It only adds its own element to `[data-sidebar-thread-provider]`, a line to that logo's tooltip, and an id to the row link's `aria-describedby`.
+- With `tile`, its CSS hides the Codex and Claude logo inside that element and widens the element to the tile. The element keeps BB's `role="img"` label and tooltip.
+- It does not touch other providers' logos, which True Colors colors, BB's spinners and activity glyphs, or BB's row actions, hover controls and keyboard behavior.
+- Those `data-sidebar-*` attributes are internal BB DOM, not a public API. If BB renames them, the badges disappear and nothing else changes.
+
+## Develop
+
+Use Bun and an installed BB CLI:
 
 ```sh
 bun install --frozen-lockfile
 bun run check
 bun test
 bun run build
-bun pm pack --ignore-scripts --destination /tmp
 ```
 
-Inspect the tarball before release: it must include the six prebuilt `dist` files and source entries, with no maps, tests or local paths. Install and verify the exact packed bytes in a disposable BB before publishing. The npm allowlist excludes screenshots; the public repository retains the original demo above.
-
-For a release, set the version in `package.json`, rebuild and pack, then publish that verified tarball with `npm publish /tmp/bb-plugin-model-effort-badges-VERSION.tgz --ignore-scripts`. Commit the reviewed source, create an immutable `vVERSION` tag and a GitHub Release with the tarball and SHA-256. Verify registry metadata and install `npm:bb-plugin-model-effort-badges@VERSION` in a fresh BB. Submit the same version to the BB Community marketplace with `PLUGIN_OVERVIEW.md` and the synthetic screenshot. Registry, GitHub release and catalog acceptance are separate checks.
-
-MIT licensed.
+The plugin stores no server data and sends no telemetry.
