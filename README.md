@@ -1,6 +1,30 @@
 # Model & Effort Badges
 
-Shows the thread's model and reasoning effort at the provider logo in BB's sidebar. For Codex and Claude Code, a model-and-effort tile replaces the logo. Provider color and style require True Colors.
+See the model family and reasoning effort for each BB thread without opening its composer. A compact code sits at the provider logo; hover for the full name and effort. The badge describes the settings for the next turn. Provider color and style require the separate True Colors plugin.
+
+![Model and effort badges in BB](assets/badges.png)
+
+*BB 0.47.1 with synthetic example data, without True Colors. Gray codes do not identify providers.*
+
+## Install
+
+Requires BB 0.46.1 and SDK 0.6.49 or later. The published version was tested on BB 0.47.1; no fresh BB 0.46.1 runtime test is claimed.
+
+```sh
+bb plugin install npm:bb-plugin-model-effort-badges@0.7.0 --yes
+```
+
+For a tracking source, use `bb plugin update model-effort-badges --yes`. To change a pinned version or installation source, save the plugin settings, remove its registration, install the desired version, then restore those settings individually. Removal resets settings.
+
+To disable or uninstall, use `bb plugin disable model-effort-badges` or `bb plugin remove model-effort-badges`.
+
+Existing users: [migration reference](MIGRATION.md).
+
+## Try it
+
+Compare the codes when several threads use different models or effort levels. Hover a provider logo to check the full name before sending the next turn. For long thread titles, choose **Under the logo** in the plugin settings to keep their width.
+
+## Read the badges
 
 ```
 [Ah]  BB                Ah   = GPT-6-Astra, High      (Codex; outlined with True Colors)
@@ -8,15 +32,11 @@ Shows the thread's model and reasoning effort at the provider logo in BB's sideb
 ```
 
 - **Letter:** the model family taken from the provider catalog name, without the vendor prefix. For example, Astra, Sol and Luna for Codex; Opus, Sonnet, Haiku and Fable for Claude.
-- **Effort:** `0` none, `l` low, `m` medium, `h` high, `xh` extra high, `max`, `u` ultra, `uc` ultracode. Any other level shows its first two letters.
+- **Effort:** `0` none, `min` minimal, `l` low, `m` medium, `h` high, `xh` extra high, `max`, `u` ultra, `uc` ultracode. Any other level shows its first two letters.
 - **Color:** the tile takes its hue from True Colors (`--pbm-brand-codex`, `--pbm-brand-claude-code` and its chroma settings). Codex is outlined, Claude is filled. Without True Colors, the letters remain gray but the colored outline and fill do not render. Two providers can show the same code (for example `Sh`); use the full-name tooltip to distinguish them.
 - **Hover:** hover the logo for the full model name and effort. BB's own provider tooltip gets a second line, for example `GPT-6-Astra · High`.
 - **Screen readers:** the thread link reads `GPT-6-Astra, High reasoning effort` as its description.
 - **Unknown:** `?` means BB has no model for the thread. The plugin never guesses one from the provider.
-
-![Model and effort badges in BB](assets/badges.png)
-
-*BB 0.47.1 with synthetic example data, without True Colors. Gray codes do not identify providers.*
 
 ## Data
 
@@ -39,27 +59,9 @@ bb plugin config model-effort-badges set placement under
 bb plugin config model-effort-badges unset placement   # back to tile
 ```
 
-## Coming from Thread Columns 0.6.0
-
-0.7.0 shows badges only. Install [Subthread Columns](https://github.com/neoromantic/bb-plugin-subthread-columns) 0.1.0 separately for columns. **Before updating**, record your actual `columns`, `maxColumns` and `placement`; follow [migration](MIGRATION.md) to restore the exact column values under the new ID. Restore badge placement under `model-effort-badges` after a pinned-version reinstall.
-
-Sidebar status marks, unread-result tracking, manager styling and **New child thread** move to [Responsibilities](https://github.com/neoromantic/bb-plugin-responsibilities) (`responsibilities`), a separate optional plugin. 0.7.0 leaves the old attention database intact and unopened.
-
-## Install, update, uninstall
-
-Requires BB 0.46.1 and SDK 0.6.49 or later. This split was runtime-tested on BB 0.47.1; no fresh BB 0.46.1 runtime test is claimed.
-
-```sh
-bb plugin install 'git:https://github.com/neoromantic/bb-plugin-model-effort-badges.git@semver:^0.7.0' --yes
-bb plugin disable model-effort-badges
-bb plugin remove model-effort-badges
-```
-
-For a tracking source, use `bb plugin update model-effort-badges --yes`. To change a pinned version or installation source, save the plugin settings, remove its registration, install the desired version, then restore those settings individually. Removal resets settings. npm publication is pending.
-
 ## Compatibility
 
-The plugin survives ordinary BB upgrades: it does not patch BB, its thread list or its database. What can break on an upgrade is the internal sidebar markup and the experimental APIs below. Then the affected badge disappears and BB's own sidebar works as before.
+This full-trust plugin uses experimental BB APIs and internal attributes of the standard sidebar. A BB upgrade or replacement sidebar can make the badges disappear. It does not patch BB or its database.
 
 - Internal markup it reads or decorates: `[data-sidebar-rename-row]`, `a[data-sidebar-thread-id]`, and the provider logo.
 - The plugin runs as an app overlay (`experimental_appOverlay`), because it needs `useSidebarThreads`, `useSdk` and `useSettings`.
@@ -67,6 +69,10 @@ The plugin survives ordinary BB upgrades: it does not patch BB, its thread list 
 - With `tile`, its CSS hides the Codex and Claude logo inside that element and widens the element to the tile. The element keeps BB's `role="img"` label and tooltip.
 - It does not touch other providers' logos, which True Colors colors, BB's spinners and activity glyphs, or BB's row actions, hover controls and keyboard behavior.
 - Those `data-sidebar-*` attributes are internal BB DOM, not a public API. If BB renames them, the badges disappear and nothing else changes.
+
+## Data and access
+
+The plugin reads thread execution settings and provider model names through your BB server. It stores no server data and adds no telemetry. BB and your configured providers have their own data handling and telemetry settings.
 
 ## Develop
 
@@ -78,5 +84,3 @@ bun run check
 bun test
 bun run build
 ```
-
-The plugin stores no server data and sends no telemetry.
