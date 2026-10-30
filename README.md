@@ -43,19 +43,19 @@ bb plugin config model-effort-badges unset placement   # back to tile
 
 0.7.0 shows badges only. Install [Subthread Columns](https://github.com/neoromantic/bb-plugin-subthread-columns) 0.1.0 separately for columns. **Before updating**, record your actual `columns`, `maxColumns` and `placement`; follow [migration](MIGRATION.md) to restore the exact column values under the new ID. Restore badge placement under `model-effort-badges` after a pinned-version reinstall.
 
-Sidebar status marks, unread-result tracking, manager styling and **New child thread** move to Responsibilities (`responsibilities`), a separate plugin not included or publicly available here. 0.7.0 leaves the old attention database intact and unopened.
+Sidebar status marks, unread-result tracking, manager styling and **New child thread** move to [Responsibilities](https://github.com/neoromantic/bb-plugin-responsibilities) (`responsibilities`), a separate optional plugin. 0.7.0 leaves the old attention database intact and unopened.
 
 ## Install, update, uninstall
 
 Requires BB 0.46.1 and SDK 0.6.49 or later. This split was runtime-tested on BB 0.47.1; no fresh BB 0.46.1 runtime test is claimed.
 
 ```sh
-bb plugin install npm:bb-plugin-model-effort-badges@0.7.0 --yes
+bb plugin install 'git:https://github.com/neoromantic/bb-plugin-model-effort-badges.git@semver:^0.7.0' --yes
 bb plugin disable model-effort-badges
 bb plugin remove model-effort-badges
 ```
 
-For a tracking source, use `bb plugin update model-effort-badges --yes`. To change a pinned version or installation source, save the plugin settings, remove its registration, install the desired version, then restore those settings individually. Removal resets settings. Source installation: `bb plugin install https://github.com/neoromantic/bb-plugin-model-effort-badges#v0.7.0 --yes`.
+For a tracking source, use `bb plugin update model-effort-badges --yes`. To change a pinned version or installation source, save the plugin settings, remove its registration, install the desired version, then restore those settings individually. Removal resets settings. npm publication is pending.
 
 ## Compatibility
 
