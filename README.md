@@ -4,7 +4,7 @@ See the model family and reasoning effort for each BB thread without opening its
 
 ![Model and effort badges in BB](assets/badges.png)
 
-*BB 0.47.1 with synthetic example data, without True Colors. Gray codes do not identify providers.*
+*Synthetic example data in BB 0.47.1 with separate [True Colors](https://github.com/ChrBoebel/bb-plugin-provider-brand-marks) 0.1.3 by ChrBoebel. Without it, codes are gray. The tooltip shows a raw model ID because this demo has no provider catalog.*
 
 ## Install
 
