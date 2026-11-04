@@ -10,6 +10,8 @@ See the model family and reasoning effort for each BB thread without opening its
 
 Requires BB 0.46.1 and SDK 0.6.49 or later. The published version was tested on BB 0.47.1; no fresh BB 0.46.1 runtime test is claimed.
 
+Open BB’s **Community Plugins → Model & Effort Badges → Install**, or run `bb plugin install model-effort-badges`. For npm:
+
 ```sh
 bb plugin install npm:bb-plugin-model-effort-badges@0.7.0 --yes
 ```
