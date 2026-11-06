@@ -1,10 +1,10 @@
 # Model & Effort Badges
 
-See the model family and reasoning effort for each BB thread without opening its composer. A compact code sits at the provider logo; hover for the full name and effort. The badge describes the settings for the next turn. Provider color and style require the separate True Colors plugin.
+See the model family and reasoning effort for each BB thread without opening its composer. A model letter with small effort strokes sits at the provider logo; hover for the full name and effort. The badge describes the settings for the next turn. Provider colors require the separate True Colors plugin.
 
 ![Model and effort badges in BB](assets/badges.png)
 
-*Synthetic example data in BB 0.47.1 with separate [True Colors](https://github.com/ChrBoebel/bb-plugin-provider-brand-marks) 0.1.3 by ChrBoebel. Without it, codes are gray. The tooltip shows a raw model ID because this demo has no provider catalog.*
+*Synthetic example data in BB 0.47.1 with separate [True Colors](https://github.com/ChrBoebel/bb-plugin-provider-brand-marks) 0.1.3 by ChrBoebel. Without it, badges are gray. The tooltip preserves the full model name and exact effort.*
 
 ## Install
 
@@ -13,7 +13,7 @@ Requires BB 0.46.1 and SDK 0.6.49 or later. The published version was tested on 
 Open BB’s **Community Plugins → Model & Effort Badges → Install**, or run `bb plugin install model-effort-badges`. For npm:
 
 ```sh
-bb plugin install npm:bb-plugin-model-effort-badges@0.7.0 --yes
+bb plugin install npm:bb-plugin-model-effort-badges@0.7.1 --yes
 ```
 
 For a tracking source, use `bb plugin update model-effort-badges --yes`. To change a pinned version or installation source, save the plugin settings, remove its registration, install the desired version, then restore those settings individually. Removal resets settings.
@@ -24,18 +24,20 @@ Existing users: [migration reference](MIGRATION.md).
 
 ## Try it
 
-Compare the codes when several threads use different models or effort levels. Hover a provider logo to check the full name before sending the next turn. For long thread titles, choose **Under the logo** in the plugin settings to keep their width.
+Compare the badges when several threads use different models or effort levels. Hover a provider logo to check the full name before sending the next turn. For long thread titles, choose **Under the logo** in the plugin settings to keep their width.
 
 ## Read the badges
 
 ```
-[Ah]  BB                Ah   = GPT-6-Astra, High      (Codex; outlined with True Colors)
-[Ouc] BB: model and …   Ouc  = Opus 5.5, Ultracode    (Claude; filled with True Colors)
+ A    BB                A + one stroke = GPT-6-Astra, High
+ ━
+ O    BB: model and …    O + four strokes = Opus 5.5, Ultracode
+ ━ ━ ━ ━
 ```
 
 - **Letter:** the model family taken from the provider catalog name, without the vendor prefix. For example, Astra, Sol and Luna for Codex; Opus, Sonnet, Haiku and Fable for Claude.
-- **Effort:** `0` none, `min` minimal, `l` low, `m` medium, `h` high, `xh` extra high, `max`, `u` ultra, `uc` ultracode. Any other level shows its first two letters.
-- **Color:** the tile takes its hue from True Colors (`--pbm-brand-codex`, `--pbm-brand-claude-code` and its chroma settings). Codex is outlined, Claude is filled. Without True Colors, the letters remain gray but the colored outline and fill do not render. Two providers can show the same code (for example `Sh`); use the full-name tooltip to distinguish them.
+- **Effort:** no strokes for none/minimal/low/medium, one for high, two for extra high, three for max, four for ultra/ultracode. Hover and screen readers retain the exact level. The `under` and `beside` placements keep the text codes: `0`, `min`, `l`, `m`, `h`, `xh`, `max`, `u`, `uc`; other levels use their first two letters.
+- **Color:** the model letter and effort strokes take their hue from True Colors (`--pbm-brand-codex`, `--pbm-brand-claude-code` and its chroma settings). Without it, badges remain gray. Two providers can show the same model letter; use the full-name tooltip to distinguish them.
 - **Hover:** hover the logo for the full model name and effort. BB's own provider tooltip gets a second line, for example `GPT-6-Astra · High`.
 - **Screen readers:** the thread link reads `GPT-6-Astra, High reasoning effort` as its description.
 - **Unknown:** `?` means BB has no model for the thread. The plugin never guesses one from the provider.
@@ -52,7 +54,7 @@ A message sent to a thread that is already running does not change `updatedAt`, 
 
 `Badge placement` (Settings → Installed plugins → Model & Effort Badges):
 
-- `tile` (default): Codex and Claude Code rows show a 16px-high tile instead of the logo. The tile is as wide as its code plus padding, and the title starts 4px after it, so a longer code such as `Sxh` or `Omax` moves the title further right. The tile never reaches into the tree indent, so it cannot touch guides or chevrons. Other providers keep the logo with the caption under it.
+- `tile` (default): Codex and Claude Code rows show an 18px-wide model letter and effort strokes instead of the logo. Its 17px height fits compact 26px rows. Every effort takes the same width; the title starts 4px after it. The badge stays inside the provider slot, clear of tree guides and chevrons. Other providers keep the logo with the caption under it.
 - `under`: a 9px caption under every provider logo. Title width does not change.
 - `beside`: a 10.5px chip next to every provider logo. It is easier to read but takes about three title characters.
 

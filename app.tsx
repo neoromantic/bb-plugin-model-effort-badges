@@ -27,10 +27,16 @@ const CSS = `
 [${BADGE}][data-placement="beside"] { display: inline-flex; align-items: baseline; flex-shrink: 0; margin: 0 6px 0 -2px; padding: 0 4px; border-radius: 4px; font-size: 10.5px; line-height: 16px; background: color-mix(in oklab, var(--muted-foreground) 14%, transparent); }
 [data-sidebar-thread-provider]:has(> [${BADGE}][data-placement="tile"]) { width: auto; min-width: 18px; margin-right: 4px; justify-content: flex-start; }
 [data-sidebar-thread-provider]:has(> [${BADGE}][data-placement="tile"]) > :not([${BADGE}]) { display: none; }
-[${BADGE}][data-placement="tile"] { display: inline-flex; align-items: baseline; justify-content: center; min-width: 18px; padding: 0 3px; border-radius: calc(var(--radius) - 4px); font-size: var(--text-2xs); line-height: 16px; font-weight: 600; letter-spacing: -.02em; --tile-color: light-dark(oklch(from var(--tile) .45 min(calc(c * var(--pbm-chroma-scale)), var(--pbm-chroma-cap)) h), oklch(from var(--tile) .82 min(calc(c * var(--pbm-chroma-scale)), var(--pbm-chroma-cap)) h)); }
+[${BADGE}][data-placement="tile"] { --effort-width: 0px; position: relative; display: inline-flex; align-items: baseline; justify-content: center; width: 18px; padding-bottom: 3px; font-size: var(--text-2xs); line-height: 14px; font-weight: 600; color: light-dark(oklch(from var(--tile) .45 min(calc(c * var(--pbm-chroma-scale)), var(--pbm-chroma-cap)) h), oklch(from var(--tile) .82 min(calc(c * var(--pbm-chroma-scale)), var(--pbm-chroma-cap)) h)); }
 [${BADGE}][data-placement="tile"] b { font-size: 1.1em; font-weight: 700; letter-spacing: 0; color: inherit; }
-[data-sidebar-thread-provider="codex"] > [${BADGE}][data-placement="tile"] { --tile: var(--pbm-brand-codex); box-shadow: inset 0 0 0 1px var(--tile-color); background: color-mix(in oklch, var(--tile-color) 10%, transparent); }
-[data-sidebar-thread-provider="claude-code"] > [${BADGE}][data-placement="tile"] { --tile: var(--pbm-brand-claude-code); background: color-mix(in oklch, var(--tile-color) 28%, transparent); }
+[${BADGE}][data-placement="tile"] b + span { display: none; }
+[${BADGE}][data-placement="tile"]::after { content: ""; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); height: 2px; width: var(--effort-width); background: repeating-linear-gradient(to right, currentColor 0 2px, transparent 2px 3px); }
+[${BADGE}][data-effort="h"] { --effort-width: 2px; }
+[${BADGE}][data-effort="xh"] { --effort-width: 5px; }
+[${BADGE}][data-effort="max"] { --effort-width: 8px; }
+[${BADGE}]:is([data-effort="u"], [data-effort="uc"]) { --effort-width: 11px; }
+[data-sidebar-thread-provider="codex"] > [${BADGE}][data-placement="tile"] { --tile: var(--pbm-brand-codex); }
+[data-sidebar-thread-provider="claude-code"] > [${BADGE}][data-placement="tile"] { --tile: var(--pbm-brand-claude-code); }
 [${TIP}] { margin-top: 1px; opacity: .8; }
 `;
 
@@ -133,6 +139,7 @@ function ModelEffortBadges() {
       }
       el.dataset.placement = placement;
       el.dataset.thread = threadId;
+      el.dataset.effort = badge.effort;
       el.dataset.tooltip = badge.tooltip;
       const [model, effort, description] = el.children;
       setText(model!, badge.model);
