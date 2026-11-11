@@ -10,10 +10,10 @@ See the model family and reasoning effort for each BB thread without opening its
 
 Requires BB 0.46.1 and SDK 0.6.49 or later. The published version was tested on BB 0.47.1; no fresh BB 0.46.1 runtime test is claimed.
 
-Open BB’s **Community Plugins → Model & Effort Badges → Install**, or run `bb plugin install model-effort-badges`. For npm:
+Open BB’s **Community Plugins → Model & Effort Badges → Install**, or run `bb plugin install model-effort-badges`. For a specific Git release:
 
 ```sh
-bb plugin install npm:bb-plugin-model-effort-badges@0.7.1 --yes
+bb plugin install git:https://github.com/neoromantic/bb-plugin-model-effort-badges.git@v0.7.2 --yes
 ```
 
 For a tracking source, use `bb plugin update model-effort-badges --yes`. To change a pinned version or installation source, save the plugin settings, remove its registration, install the desired version, then restore those settings individually. Removal resets settings.
@@ -76,7 +76,7 @@ This full-trust plugin uses experimental BB APIs and internal attributes of the 
 
 ## Data and access
 
-The plugin reads thread execution settings and provider model names through your BB server. It stores no server data and adds no telemetry; the browser's local storage keeps the last model, effort and provider model names it read. BB and your configured providers have their own data handling and telemetry settings.
+The plugin reads thread execution settings and provider model names through your BB server. It stores no data on the server and adds no telemetry; the browser's local storage keeps the last model, effort and provider model names it read. BB and your configured providers have their own data handling and telemetry settings.
 
 ## Develop
 
