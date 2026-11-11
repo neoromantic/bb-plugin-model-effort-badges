@@ -46,7 +46,7 @@ Compare the badges when several threads use different models or effort levels. H
 
 Each visible row reads `threads.defaultExecutionOptions`, which calls `GET /api/v1/threads/:id/default-execution-options`. This is the value the composer uses for the thread's next turn: the sticky override if set, else the last turn request, else the project default. On the server it is one indexed lookup, not a history scan.
 
-Names come from `providers.models` once per provider. The plugin fetches a row again only when `updatedAt` or `status` changes in BB's live sidebar data. There are no timers or polling.
+Names come from `providers.models` once per provider. The plugin fetches a row again only when `updatedAt` or `status` changes in BB's live sidebar data. There are no timers or polling. The last answer for each thread and the provider names are kept in this browser's local storage, so badges show at once after a restart.
 
 A message sent to a thread that is already running does not change `updatedAt`, so a model switch made that way shows once the thread goes idle.
 
@@ -76,7 +76,7 @@ This full-trust plugin uses experimental BB APIs and internal attributes of the 
 
 ## Data and access
 
-The plugin reads thread execution settings and provider model names through your BB server. It stores no server data and adds no telemetry. BB and your configured providers have their own data handling and telemetry settings.
+The plugin reads thread execution settings and provider model names through your BB server. It stores no server data and adds no telemetry; the browser's local storage keeps the last model, effort and provider model names it read. BB and your configured providers have their own data handling and telemetry settings.
 
 ## Develop
 
