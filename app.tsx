@@ -11,6 +11,8 @@ import { describe, type Badge, type Catalog, type Execution } from "./format";
 const ICON = "[data-sidebar-thread-provider]";
 const BADGE = "data-model-effort";
 const TIP = "data-model-effort-tip";
+/** Set on a logo that holds a tile. A :has() rule for this restyles the whole sidebar on every element added to a row. */
+const TILE = "data-model-effort-tile";
 
 /** Providers whose logo the tile replaces; the rest keep the caption under their logo. */
 const TILE_PROVIDERS = new Set(["codex", "claude-code"]);
@@ -29,8 +31,8 @@ const CSS = `
 [${BADGE}] [id] { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 [${BADGE}][data-placement="under"] { position: absolute; left: 50%; top: calc(100% - .75px); transform: translateX(-50%); font-size: 9px; line-height: 7px; letter-spacing: .02em; }
 [${BADGE}][data-placement="beside"] { display: inline-flex; align-items: baseline; flex-shrink: 0; margin: 0 6px 0 -2px; padding: 0 4px; border-radius: 4px; font-size: 10.5px; line-height: 16px; background: color-mix(in oklab, var(--muted-foreground) 14%, transparent); }
-[data-sidebar-thread-provider]:has(> [${BADGE}][data-placement="tile"]) { width: auto; min-width: 18px; margin-right: 4px; justify-content: flex-start; }
-[data-sidebar-thread-provider]:has(> [${BADGE}][data-placement="tile"]) > :not([${BADGE}]) { display: none; }
+[data-sidebar-thread-provider][${TILE}] { width: auto; min-width: 18px; margin-right: 4px; justify-content: flex-start; }
+[data-sidebar-thread-provider][${TILE}] > :not([${BADGE}]) { display: none; }
 [${BADGE}][data-placement="tile"] { --effort-width: 0px; position: relative; display: inline-flex; align-items: baseline; justify-content: center; width: 18px; padding-bottom: 3px; font-size: var(--text-2xs); line-height: 14px; font-weight: 600; color: light-dark(oklch(from var(--tile) .45 min(calc(c * var(--pbm-chroma-scale)), var(--pbm-chroma-cap)) h), oklch(from var(--tile) .82 min(calc(c * var(--pbm-chroma-scale)), var(--pbm-chroma-cap)) h)); }
 [${BADGE}][data-placement="tile"] b { font-size: 1.1em; font-weight: 700; letter-spacing: 0; color: inherit; }
 [${BADGE}][data-placement="tile"] b + span { display: none; }
@@ -72,6 +74,7 @@ function describedBy(link: Element, id: string, add: boolean) {
 function removeBadge(badge: HTMLElement) {
   const id = badge.querySelector("[id]")?.id;
   const link = rowLink(badge.closest(ICON) ?? badge);
+  badge.closest(ICON)?.removeAttribute(TILE);
   if (id && link) describedBy(link, id, false);
   badge.remove();
 }
@@ -142,6 +145,7 @@ function ModelEffortBadges() {
         else icon.append(el);
       }
       el.dataset.placement = placement;
+      icon.toggleAttribute(TILE, placement === "tile");
       el.dataset.thread = threadId;
       el.dataset.effort = badge.effort;
       el.dataset.tooltip = badge.tooltip;
