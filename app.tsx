@@ -18,6 +18,10 @@ const TILE_PROVIDERS = new Set(["codex", "claude-code"]);
 type Placement = "tile" | "under" | "beside";
 type Entry = { key: string; execution: Execution | null };
 
+/** Kept per device, so a restart shows every badge at once instead of asking the server row by row. */
+const CACHE_KEY = "model-effort-badges:executions";
+const CATALOG_KEY = "model-effort-badges:catalogs";
+
 const CSS = `
 [${BADGE}] { pointer-events: none; white-space: nowrap; color: var(--muted-foreground); font-variant-numeric: tabular-nums; }
 [${BADGE}] b { font-weight: 650; color: var(--sidebar-foreground); }
@@ -77,8 +81,8 @@ function ModelEffortBadges() {
   const { threads } = useSidebarThreads();
   const setting = useSettings().values?.placement;
   const placement: Placement = setting === "under" || setting === "beside" ? setting : "tile";
-  const [executions, setExecutions] = useState(() => new Map<string, Entry>());
-  const [catalogs, setCatalogs] = useState(() => new Map<string, Catalog>());
+  const [executions, setExecutions] = useState(() => new Map<string, Entry>(JSON.parse(localStorage.getItem(CACHE_KEY) ?? "[]")));
+  const [catalogs, setCatalogs] = useState(() => new Map<string, Catalog>(JSON.parse(localStorage.getItem(CATALOG_KEY) ?? "[]")));
   const latest = useRef({ threads, executions, catalogs, placement });
   latest.current = { threads, executions, catalogs, placement };
   const schedule = useRef(() => {});
@@ -89,7 +93,7 @@ function ModelEffortBadges() {
     let ids = 0;
     // Last key requested per thread, kept after failures so a broken thread
     // is retried when it changes rather than on every sidebar mutation.
-    const requested = new Map<string, string>();
+    const requested = new Map([...latest.current.executions].map(([threadId, entry]) => [threadId, entry.key]));
     const requestedCatalogs = new Set<string>();
 
     const loadExecution = (threadId: string, key: string) => {
@@ -192,6 +196,7 @@ function ModelEffortBadges() {
       node instanceof Element && (node.matches(ICON) || node.querySelector(ICON) !== null || node.closest("[data-sidebar-rename-row]") !== null);
 
     const observer = new MutationObserver((records) => {
+      if (frame) return;
       for (const record of records) {
         if (record.type === "attributes" ? (record.target as Element).matches(ICON) : touchesSidebar(record.target) || [...record.addedNodes].some(touchesSidebar)) {
           schedule.current();
@@ -212,6 +217,13 @@ function ModelEffortBadges() {
   }, [sdk]);
 
   useEffect(() => schedule.current(), [threads, executions, catalogs, placement]);
+
+  useEffect(() => {
+    const ids = new Set(threads.map((thread) => thread.id));
+    localStorage.setItem(CACHE_KEY, JSON.stringify([...executions].filter(([threadId]) => ids.size === 0 || ids.has(threadId))));
+  }, [executions]);
+
+  useEffect(() => localStorage.setItem(CATALOG_KEY, JSON.stringify([...catalogs])), [catalogs]);
 
   return <style>{CSS}</style>;
 }
