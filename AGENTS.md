@@ -59,4 +59,48 @@ Use the project section's native commands for checks, offline tests and builds:
 
 ## Project
 
-Project-specific rules go here, below the devkit block.
+Model & Effort Badges is a BB plugin that shows each sidebar thread's model family and reasoning
+effort at its provider logo. It reads BB's thread execution options and provider model catalogs
+through the plugin SDK and stores nothing on the server.
+
+### Layout
+
+- `package.json` `"bb"` declares the entry files: `server.ts` (`server`: the `placement`
+  setting) and `app.tsx` (`app`: the sidebar overlay that renders the badges).
+- `format.ts` turns an execution and a catalog into a badge; `format.test.ts` covers it.
+- `bun run build` writes `dist/`, which is git-ignored. `files` in `package.json` lists what the
+  package ships: the sources, the built `dist/` files and the docs.
+
+### Commands
+
+```sh
+bun install --frozen-lockfile
+bun run check   # oxfmt --check, oxlint with landmines, tsc --noEmit, Knip
+bun run test    # bun test, offline
+bun run build   # bb plugin build, with the bb CLI from the bb-app devDependency
+bun run format  # oxfmt in place
+```
+
+CI (`.github/workflows/ci.yml`, devkit `ci-bun`) runs `check`, `build` and `test`.
+
+### Gotchas
+
+- `bb plugin build` uses `esbuild`, `tailwindcss`, `@tailwindcss/node` and `@tailwindcss/oxide`
+  from `node_modules` only at the exact versions that `bb-app` pins; otherwise it downloads its
+  own copy. Update them together with `bb-app`. Nothing imports them, so `knip.json` ignores
+  them.
+- `react` is not a dependency: the build maps it to the React that BB provides at runtime, and
+  `@types/react` supplies the types. `knip.json` ignores it.
+- The build scans the repo's files with Tailwind, docs and config included, so new words there
+  can add utility rules to `dist/app.css`. The plugin uses no Tailwind classes; its own CSS is
+  in `app.tsx`.
+
+### Release
+
+1. On a `release/<version>` branch, commit `Prepare Model & Effort Badges <version>`: bump
+   `version` in `package.json` and the pinned `@v<version>` install command in `README.md`, and
+   update `PLUGIN_OVERVIEW.md` when its text changes.
+2. Open a PR and merge it with a merge commit once `ci` passes.
+3. Owner only: tag the merge commit `v<version>` and publish the GitHub Release
+   `Model & Effort Badges <version>` with the release notes, the package tarball with the built
+   `dist/`, source archives and `SHA256SUMS`. npm publication is deferred.
