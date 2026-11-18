@@ -88,3 +88,5 @@ bun run check
 bun test
 bun run build
 ```
+
+`bun run check` checks formatting with oxfmt, lints with oxlint and the [landmines](https://github.com/interfere-inc/landmines) rules, then type-checks. `bun run format` formats the repo in place. The landmines rules need Node 22.18 or later on `PATH`. `.oxfmtrc.jsonc` and `.oxlintrc.devkit.jsonc` are the shared [devkit](https://github.com/neoromantic/devkit) configs, kept unchanged; this repo's lint exceptions go in `.oxlintrc.json`.
