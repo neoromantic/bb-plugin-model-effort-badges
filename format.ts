@@ -29,7 +29,6 @@ const UNKNOWN: Badge = {
   description: "model and effort unknown",
 };
 
-/** First word of the model name that is not the vendor brand: "GPT-6-Astra" → "Astra". */
 function family(name: string, brandPrefix: string | null): string {
   const brand = brandPrefix?.replace(/[^a-z0-9]+$/i, "").toLowerCase();
   const words = name.split(/[^a-z0-9.]+/i);

@@ -7,20 +7,17 @@ import {
 } from "@get-bb/plugin-sdk/app";
 import { describe, type Badge, type Catalog, type Execution } from "./format";
 
-/** BB's sidebar thread-row provider logo; True Colors paints the mask inside it. */
 const ICON = "[data-sidebar-thread-provider]";
 const BADGE = "data-model-effort";
 const TIP = "data-model-effort-tip";
-/** Set on a logo that holds a tile. A :has() rule for this restyles the whole sidebar on every element added to a row. */
+// WARNING: a :has() rule in place of this attribute restyles the whole sidebar on every row change.
 const TILE = "data-model-effort-tile";
 
-/** Providers whose logo the tile replaces; the rest keep the caption under their logo. */
 const TILE_PROVIDERS = new Set(["codex", "claude-code"]);
 
 type Placement = "tile" | "under" | "beside";
 type Entry = { key: string; execution: Execution | null };
 
-/** Kept per device, so a restart shows every badge at once instead of asking the server row by row. */
 const CACHE_KEY = "model-effort-badges:executions";
 const CATALOG_KEY = "model-effort-badges:catalogs";
 
@@ -104,8 +101,6 @@ function ModelEffortBadges() {
     let alive = true;
     let frame = 0;
     let ids = 0;
-    // Last key requested per thread, kept after failures so a broken thread
-    // is retried when it changes rather than on every sidebar mutation.
     const requested = new Map(
       [...latest.current.executions].map(([threadId, entry]) => [threadId, entry.key]),
     );
@@ -155,7 +150,6 @@ function ModelEffortBadges() {
       if (!el) {
         el = document.createElement("span");
         el.setAttribute(BADGE, "");
-        // The row link reads the full description; the code itself is decoration.
         el.setAttribute("aria-hidden", "true");
         const description = document.createElement("span");
         description.id = `model-effort-${++ids}`;
@@ -207,7 +201,6 @@ function ModelEffortBadges() {
         const threadId = link?.dataset.sidebarThreadId;
         const providerId = icon.dataset.sidebarThreadProvider;
         if (!link || !threadId || !providerId) continue;
-        // updatedAt moves when a turn starts or ends and when a sticky override changes.
         const key = keys.get(threadId) ?? "";
         if (requested.get(threadId) !== key) loadExecution(threadId, key);
         if (!requestedCatalogs.has(providerId)) loadCatalog(providerId);
