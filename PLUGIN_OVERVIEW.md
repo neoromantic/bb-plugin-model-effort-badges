@@ -4,7 +4,7 @@ See each BB thread’s model family and reasoning effort without opening its com
 
 ![Model and effort badges in BB](assets/badges.png)
 
-*Synthetic example data in BB 0.47.1 with separate [True Colors](https://github.com/ChrBoebel/bb-plugin-provider-brand-marks) 0.1.3 by ChrBoebel. Without it, badges are gray. The tooltip preserves the full model name and exact effort.*
+_Synthetic example data in BB 0.47.1 with separate [True Colors](https://github.com/ChrBoebel/bb-plugin-provider-brand-marks) 0.1.3 by ChrBoebel. Without it, badges are gray. The tooltip preserves the full model name and exact effort._
 
 Compare several threads at a glance. Choose a tile, a caption under the logo, or a chip beside it; tile is the default for Codex and Claude Code. Use the caption to preserve long titles. Badges show the next turn’s settings; a switch sent to an already running thread appears when it goes idle.
 

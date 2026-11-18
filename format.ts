@@ -39,10 +39,15 @@ function family(name: string, brandPrefix: string | null): string {
 export function describe(execution: Execution | null, catalog: Catalog | undefined): Badge {
   if (!execution) return UNKNOWN;
   const { model, reasoningLevel } = execution;
-  const modelName = catalog?.models.find((entry) => entry.id === model || entry.model === model)?.displayName ?? model;
-  const effortName = catalog?.efforts.find((entry) => entry.id === reasoningLevel)?.label ?? reasoningLevel;
+  const modelName =
+    catalog?.models.find((entry) => entry.id === model || entry.model === model)?.displayName ??
+    model;
+  const effortName =
+    catalog?.efforts.find((entry) => entry.id === reasoningLevel)?.label ?? reasoningLevel;
   return {
-    model: family(modelName, catalog?.brandPrefix ?? null).charAt(0).toUpperCase(),
+    model: family(modelName, catalog?.brandPrefix ?? null)
+      .charAt(0)
+      .toUpperCase(),
     effort: EFFORT_CODES[reasoningLevel] ?? reasoningLevel.slice(0, 2).toLowerCase(),
     tooltip: `${modelName} · ${effortName}`,
     description: `${modelName}, ${effortName} reasoning effort`,
