@@ -4,7 +4,7 @@ See the model family and reasoning effort for each BB thread without opening its
 
 ![Model and effort badges in BB](assets/badges.png)
 
-*Synthetic example data in BB 0.47.1 with separate [True Colors](https://github.com/ChrBoebel/bb-plugin-provider-brand-marks) 0.1.3 by ChrBoebel. Without it, badges are gray. The tooltip preserves the full model name and exact effort.*
+_Synthetic example data in BB 0.47.1 with separate [True Colors](https://github.com/ChrBoebel/bb-plugin-provider-brand-marks) 0.1.3 by ChrBoebel. Without it, badges are gray. The tooltip preserves the full model name and exact effort._
 
 ## Install
 
@@ -88,3 +88,5 @@ bun run check
 bun test
 bun run build
 ```
+
+`bun run check` checks formatting with oxfmt, lints with oxlint and the [landmines](https://github.com/interfere-inc/landmines) rules, then type-checks. `bun run format` formats the repo in place. The landmines rules need Node 22.18 or later on `PATH`. `.oxfmtrc.jsonc` and `.oxlintrc.devkit.jsonc` are the shared [devkit](https://github.com/neoromantic/devkit) configs, kept unchanged; this repo's lint exceptions go in `.oxlintrc.json`.

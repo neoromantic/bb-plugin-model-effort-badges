@@ -29,22 +29,26 @@ const UNKNOWN: Badge = {
   description: "model and effort unknown",
 };
 
-/** First word of the model name that is not the vendor brand: "GPT-6-Astra" → "Astra". */
-function family(name: string, brandPrefix: string | null): string {
+function family(name: string, brandPrefix: string | null) {
   const brand = brandPrefix?.replace(/[^a-z0-9]+$/i, "").toLowerCase();
   const words = name.split(/[^a-z0-9.]+/i);
   return words.find((word) => /[a-z]/i.test(word) && word.toLowerCase() !== brand) ?? name;
 }
 
-export function describe(execution: Execution | null, catalog: Catalog | undefined): Badge {
+export function describe(execution: Execution | null, catalog: Catalog | undefined) {
   if (!execution) return UNKNOWN;
   const { model, reasoningLevel } = execution;
-  const modelName = catalog?.models.find((entry) => entry.id === model || entry.model === model)?.displayName ?? model;
-  const effortName = catalog?.efforts.find((entry) => entry.id === reasoningLevel)?.label ?? reasoningLevel;
+  const modelName =
+    catalog?.models.find((entry) => entry.id === model || entry.model === model)?.displayName ??
+    model;
+  const effortName =
+    catalog?.efforts.find((entry) => entry.id === reasoningLevel)?.label ?? reasoningLevel;
   return {
-    model: family(modelName, catalog?.brandPrefix ?? null).charAt(0).toUpperCase(),
+    model: family(modelName, catalog?.brandPrefix ?? null)
+      .charAt(0)
+      .toUpperCase(),
     effort: EFFORT_CODES[reasoningLevel] ?? reasoningLevel.slice(0, 2).toLowerCase(),
     tooltip: `${modelName} · ${effortName}`,
     description: `${modelName}, ${effortName} reasoning effort`,
-  };
+  } satisfies Badge;
 }

@@ -7,20 +7,17 @@ import {
 } from "@get-bb/plugin-sdk/app";
 import { describe, type Badge, type Catalog, type Execution } from "./format";
 
-/** BB's sidebar thread-row provider logo; True Colors paints the mask inside it. */
 const ICON = "[data-sidebar-thread-provider]";
 const BADGE = "data-model-effort";
 const TIP = "data-model-effort-tip";
-/** Set on a logo that holds a tile. A :has() rule for this restyles the whole sidebar on every element added to a row. */
+// WARNING: a :has() rule in place of this attribute restyles the whole sidebar on every row change.
 const TILE = "data-model-effort-tile";
 
-/** Providers whose logo the tile replaces; the rest keep the caption under their logo. */
 const TILE_PROVIDERS = new Set(["codex", "claude-code"]);
 
 type Placement = "tile" | "under" | "beside";
 type Entry = { key: string; execution: Execution | null };
 
-/** Kept per device, so a restart shows every badge at once instead of asking the server row by row. */
 const CACHE_KEY = "model-effort-badges:executions";
 const CATALOG_KEY = "model-effort-badges:catalogs";
 
@@ -46,15 +43,19 @@ const CSS = `
 [${TIP}] { margin-top: 1px; opacity: .8; }
 `;
 
-function badgeOf(icon: Element): HTMLElement | null {
+function badgeOf(icon: Element) {
   const inside = icon.querySelector<HTMLElement>(`:scope > [${BADGE}]`);
   if (inside) return inside;
   const next = icon.nextElementSibling;
   return next instanceof HTMLElement && next.hasAttribute(BADGE) ? next : null;
 }
 
-function rowLink(icon: Element): HTMLAnchorElement | null {
-  return icon.closest("[data-sidebar-rename-row]")?.querySelector<HTMLAnchorElement>("a[data-sidebar-thread-id]") ?? null;
+function rowLink(icon: Element) {
+  return (
+    icon
+      .closest("[data-sidebar-rename-row]")
+      ?.querySelector<HTMLAnchorElement>("a[data-sidebar-thread-id]") ?? null
+  );
 }
 
 function setText(node: Element, text: string) {
@@ -62,7 +63,9 @@ function setText(node: Element, text: string) {
 }
 
 function describedBy(link: Element, id: string, add: boolean) {
-  const ids = (link.getAttribute("aria-describedby") ?? "").split(/\s+/).filter((token) => token && token !== id);
+  const ids = (link.getAttribute("aria-describedby") ?? "")
+    .split(/\s+/)
+    .filter((token) => token && token !== id);
   if (add) ids.push(id);
   const next = ids.join(" ");
   if (next !== (link.getAttribute("aria-describedby") ?? "")) {
@@ -84,8 +87,12 @@ function ModelEffortBadges() {
   const { threads } = useSidebarThreads();
   const setting = useSettings().values?.placement;
   const placement: Placement = setting === "under" || setting === "beside" ? setting : "tile";
-  const [executions, setExecutions] = useState(() => new Map<string, Entry>(JSON.parse(localStorage.getItem(CACHE_KEY) ?? "[]")));
-  const [catalogs, setCatalogs] = useState(() => new Map<string, Catalog>(JSON.parse(localStorage.getItem(CATALOG_KEY) ?? "[]")));
+  const [executions, setExecutions] = useState(
+    () => new Map<string, Entry>(JSON.parse(localStorage.getItem(CACHE_KEY) ?? "[]")),
+  );
+  const [catalogs, setCatalogs] = useState(
+    () => new Map<string, Catalog>(JSON.parse(localStorage.getItem(CATALOG_KEY) ?? "[]")),
+  );
   const latest = useRef({ threads, executions, catalogs, placement });
   latest.current = { threads, executions, catalogs, placement };
   const schedule = useRef(() => {});
@@ -94,9 +101,9 @@ function ModelEffortBadges() {
     let alive = true;
     let frame = 0;
     let ids = 0;
-    // Last key requested per thread, kept after failures so a broken thread
-    // is retried when it changes rather than on every sidebar mutation.
-    const requested = new Map([...latest.current.executions].map(([threadId, entry]) => [threadId, entry.key]));
+    const requested = new Map(
+      [...latest.current.executions].map(([threadId, entry]) => [threadId, entry.key]),
+    );
     const requestedCatalogs = new Set<string>();
 
     const loadExecution = (threadId: string, key: string) => {
@@ -104,7 +111,10 @@ function ModelEffortBadges() {
       sdk.threads.defaultExecutionOptions({ threadId }).then(
         (options) => {
           if (!alive || requested.get(threadId) !== key) return;
-          const execution = options && { model: options.model, reasoningLevel: options.reasoningLevel };
+          const execution = options && {
+            model: options.model,
+            reasoningLevel: options.reasoningLevel,
+          };
           setExecutions((prev) => new Map(prev).set(threadId, { key, execution }));
         },
         () => {},
@@ -129,12 +139,17 @@ function ModelEffortBadges() {
       );
     };
 
-    const render = (icon: HTMLElement, link: HTMLAnchorElement, threadId: string, badge: Badge, placement: Placement) => {
+    const render = (
+      icon: HTMLElement,
+      link: HTMLAnchorElement,
+      threadId: string,
+      badge: Badge,
+      placement: Placement,
+    ) => {
       let el = badgeOf(icon);
       if (!el) {
         el = document.createElement("span");
         el.setAttribute(BADGE, "");
-        // The row link reads the full description; the code itself is decoration.
         el.setAttribute("aria-hidden", "true");
         const description = document.createElement("span");
         description.id = `model-effort-${++ids}`;
@@ -171,23 +186,35 @@ function ModelEffortBadges() {
     const sync = () => {
       frame = 0;
       const { threads, executions, catalogs, placement } = latest.current;
-      const keys = new Map(threads.map((thread) => [thread.id, `${thread.updatedAt}:${thread.status}`]));
+      const keys = new Map(
+        threads.map((thread) => [thread.id, `${thread.updatedAt}:${thread.status}`]),
+      );
       for (const badge of document.querySelectorAll<HTMLElement>(`[${BADGE}]`)) {
-        const icon = badge.parentElement?.matches(ICON) ? badge.parentElement : badge.previousElementSibling;
-        if (!icon?.matches(ICON) || rowLink(icon)?.dataset.sidebarThreadId !== badge.dataset.thread) removeBadge(badge);
+        const icon = badge.parentElement?.matches(ICON)
+          ? badge.parentElement
+          : badge.previousElementSibling;
+        if (!icon?.matches(ICON) || rowLink(icon)?.dataset.sidebarThreadId !== badge.dataset.thread)
+          removeBadge(badge);
       }
       for (const icon of document.querySelectorAll<HTMLElement>(ICON)) {
         const link = rowLink(icon);
         const threadId = link?.dataset.sidebarThreadId;
         const providerId = icon.dataset.sidebarThreadProvider;
         if (!link || !threadId || !providerId) continue;
-        // updatedAt moves when a turn starts or ends and when a sticky override changes.
         const key = keys.get(threadId) ?? "";
         if (requested.get(threadId) !== key) loadExecution(threadId, key);
         if (!requestedCatalogs.has(providerId)) loadCatalog(providerId);
         const entry = executions.get(threadId);
-        const rendered = placement === "tile" && !TILE_PROVIDERS.has(providerId) ? "under" : placement;
-        if (entry) render(icon, link, threadId, describe(entry.execution, catalogs.get(providerId)), rendered);
+        const rendered =
+          placement === "tile" && !TILE_PROVIDERS.has(providerId) ? "under" : placement;
+        if (entry)
+          render(
+            icon,
+            link,
+            threadId,
+            describe(entry.execution, catalogs.get(providerId)),
+            rendered,
+          );
       }
       showTooltip();
     };
@@ -197,18 +224,30 @@ function ModelEffortBadges() {
     };
 
     const touchesSidebar = (node: Node) =>
-      node instanceof Element && (node.matches(ICON) || node.querySelector(ICON) !== null || node.closest("[data-sidebar-rename-row]") !== null);
+      node instanceof Element &&
+      (node.matches(ICON) ||
+        node.querySelector(ICON) !== null ||
+        node.closest("[data-sidebar-rename-row]") !== null);
 
     const observer = new MutationObserver((records) => {
       if (frame) return;
       for (const record of records) {
-        if (record.type === "attributes" ? (record.target as Element).matches(ICON) : touchesSidebar(record.target) || [...record.addedNodes].some(touchesSidebar)) {
+        if (
+          record.type === "attributes"
+            ? (record.target as Element).matches(ICON)
+            : touchesSidebar(record.target) || [...record.addedNodes].some(touchesSidebar)
+        ) {
           schedule.current();
           return;
         }
       }
     });
-    observer.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ["data-state"] });
+    observer.observe(document.body, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ["data-state"],
+    });
     schedule.current();
 
     return () => {
@@ -224,7 +263,10 @@ function ModelEffortBadges() {
 
   useEffect(() => {
     const ids = new Set(threads.map((thread) => thread.id));
-    localStorage.setItem(CACHE_KEY, JSON.stringify([...executions].filter(([threadId]) => ids.size === 0 || ids.has(threadId))));
+    localStorage.setItem(
+      CACHE_KEY,
+      JSON.stringify([...executions].filter(([threadId]) => ids.size === 0 || ids.has(threadId))),
+    );
   }, [executions]);
 
   useEffect(() => localStorage.setItem(CATALOG_KEY, JSON.stringify([...catalogs])), [catalogs]);

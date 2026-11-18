@@ -26,12 +26,17 @@ test("uses catalog names without the vendor brand", () => {
     tooltip: "GPT-6-Astra · High",
     description: "GPT-6-Astra, High reasoning effort",
   });
-  expect(describe({ model: "gpt-6.1-sol", reasoningLevel: "xhigh" }, codex)).toMatchObject({ model: "S", effort: "xh" });
-  expect(describe({ model: "claude-opus-5-5", reasoningLevel: "ultracode" }, claude)).toMatchObject({
-    model: "O",
-    effort: "uc",
-    tooltip: "Opus 5.5 · Ultracode",
+  expect(describe({ model: "gpt-6.1-sol", reasoningLevel: "xhigh" }, codex)).toMatchObject({
+    model: "S",
+    effort: "xh",
   });
+  expect(describe({ model: "claude-opus-5-5", reasoningLevel: "ultracode" }, claude)).toMatchObject(
+    {
+      model: "O",
+      effort: "uc",
+      tooltip: "Opus 5.5 · Ultracode",
+    },
+  );
 });
 
 test("shows raw ids for models and efforts the catalog does not list", () => {
@@ -41,9 +46,16 @@ test("shows raw ids for models and efforts the catalog does not list", () => {
     tooltip: "claude-sonnet-9 · turbo",
     description: "claude-sonnet-9, turbo reasoning effort",
   });
-  expect(describe({ model: "grok-4", reasoningLevel: "max" }, undefined)).toMatchObject({ model: "G", effort: "max" });
+  expect(describe({ model: "grok-4", reasoningLevel: "max" }, undefined)).toMatchObject({
+    model: "G",
+    effort: "max",
+  });
 });
 
 test("keeps an unresolved thread honest", () => {
-  expect(describe(null, codex)).toMatchObject({ model: "?", effort: "", tooltip: "Model and effort unknown" });
+  expect(describe(null, codex)).toMatchObject({
+    model: "?",
+    effort: "",
+    tooltip: "Model and effort unknown",
+  });
 });
