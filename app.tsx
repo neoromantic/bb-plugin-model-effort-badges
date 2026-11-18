@@ -43,14 +43,14 @@ const CSS = `
 [${TIP}] { margin-top: 1px; opacity: .8; }
 `;
 
-function badgeOf(icon: Element): HTMLElement | null {
+function badgeOf(icon: Element) {
   const inside = icon.querySelector<HTMLElement>(`:scope > [${BADGE}]`);
   if (inside) return inside;
   const next = icon.nextElementSibling;
   return next instanceof HTMLElement && next.hasAttribute(BADGE) ? next : null;
 }
 
-function rowLink(icon: Element): HTMLAnchorElement | null {
+function rowLink(icon: Element) {
   return (
     icon
       .closest("[data-sidebar-rename-row]")

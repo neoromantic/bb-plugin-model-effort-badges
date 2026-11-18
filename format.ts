@@ -29,13 +29,13 @@ const UNKNOWN: Badge = {
   description: "model and effort unknown",
 };
 
-function family(name: string, brandPrefix: string | null): string {
+function family(name: string, brandPrefix: string | null) {
   const brand = brandPrefix?.replace(/[^a-z0-9]+$/i, "").toLowerCase();
   const words = name.split(/[^a-z0-9.]+/i);
   return words.find((word) => /[a-z]/i.test(word) && word.toLowerCase() !== brand) ?? name;
 }
 
-export function describe(execution: Execution | null, catalog: Catalog | undefined): Badge {
+export function describe(execution: Execution | null, catalog: Catalog | undefined) {
   if (!execution) return UNKNOWN;
   const { model, reasoningLevel } = execution;
   const modelName =
@@ -50,5 +50,5 @@ export function describe(execution: Execution | null, catalog: Catalog | undefin
     effort: EFFORT_CODES[reasoningLevel] ?? reasoningLevel.slice(0, 2).toLowerCase(),
     tooltip: `${modelName} · ${effortName}`,
     description: `${modelName}, ${effortName} reasoning effort`,
-  };
+  } satisfies Badge;
 }
